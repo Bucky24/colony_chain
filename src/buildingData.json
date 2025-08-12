@@ -1,0 +1,79 @@
+{
+  "port": {
+    "type": "exporter",
+    "exportLevel": "planet",
+    "levels": [
+      {
+        "cost": {
+          "money": 100
+        },
+        "exportModifier": 0.1,
+        "requires": {
+          "workers": 10
+        }
+      }
+    ]
+  },
+  "mine": {
+    "type": "generator",
+    "levels": [
+      {
+        "cost": {
+          "money": 100
+        },
+        "generates": {
+          "ore": 1
+        },
+        "requires": {
+          "workers": 5
+        }
+      }
+    ]
+  },
+  "farm": {
+    "type": "generator",
+    "levels": [
+      {
+        "cost": {
+          "money": 100
+        },
+        "generates": {
+          "food": 2
+        },
+        "requires": {
+          "workers": 5
+        }
+      }
+    ]
+  },
+  "house": {
+    "type": "generator",
+    "levels": [
+      {
+        "cost": {
+          "money": 100
+        },
+        "generates": {
+          "workers": 20
+        },
+        "generatesMin": {
+          "workers": 1
+        },
+        "requires": {
+          "food": 1
+        }
+      }
+    ]
+  },
+  "vault": {
+    "type": "collector",
+    "levels": [
+      {
+        "cost": {
+          "money": 1000
+        },
+        "capacity": 50
+      }
+    ]
+  }
+}
