@@ -17,6 +17,14 @@ export default class Data {
     return Object.values(this.__data);
   }
 
+  getData() {
+    return this.__data;
+  }
+  
+  setAll(data) {
+    this.__data = {...data};
+  }
+
   clear() {
     this.__data = {};
   }
