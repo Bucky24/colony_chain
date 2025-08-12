@@ -7,11 +7,15 @@ import { BuildingDataInstance } from "../data/building";
 import { BUILDING_TYPES } from "../types";
 import DataContext from "../contexts/DataContext";
 
+const SELECT_MODE = 'select';
+const CONNECT_MODE = 'connect';
+
 export default function PlanetView() {
   const { systemId, id } = useParams();
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
   const [selectedBuildingType, setSelectedBuildingType] = useState(null);
+  const [mode, setMode] = useState(SELECT_MODE);
 
   const system = SystemDataInstance.get(systemId);
 
@@ -59,7 +63,23 @@ export default function PlanetView() {
     <div style={{
       flexGrow: 1,
     }}>
-      <PlanetMap planetId={id} onSelect={(x, y) => setSelected({ x, y })} />
+      <PlanetMap
+        planetId={id}
+        onSelect={(x, y) => {
+          if (mode === SELECT_MODE) {
+            setSelected({ x, y });
+          } else if (mode === CONNECT_MODE) {
+            const buildingAt = PlanetDataInstance.getBuildingAtLocation(id, x, y);
+
+            if (buildingAt) {
+              BuildingDataInstance.connectBuildings(selectedBuilding.id, buildingAt.id);
+            }
+
+            setMode(SELECT_MODE);
+          }
+        }}
+        select={selected}
+      />
     </div>
     <div style={{
       flexBasis: 150,
@@ -69,6 +89,17 @@ export default function PlanetView() {
         <h3>Cell {selected.x},{selected.y}</h3>
         {selectedBuilding && <div>
           <h3>{selectedBuilding.type}</h3>
+          <h3>Connections:</h3>
+          {selectedBuilding.connections.map((connection) => {
+            const otherBuilding = BuildingDataInstance.get(connection.otherId);
+
+            if (!otherBuilding) return null;
+
+            return <div>{otherBuilding.type} at ({otherBuilding.x},{otherBuilding.y})</div>
+          })}
+          <button onClick={() => {
+            setMode(CONNECT_MODE);
+          }}>Add Connection</button>
         </div>}
         {!selectedBuilding && <div>
           <h3>No building</h3>

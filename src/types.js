@@ -17,3 +17,6 @@ export const BUILDING_IMAGES = {
   PORT: PortImage,
   MINE: MineImage,
 };
+
+export const CONNECTION_FROM = 'from';
+export const CONNECTION_TO = 'to';
