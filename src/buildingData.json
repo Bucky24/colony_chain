@@ -1,5 +1,5 @@
 {
-  "port": {
+  "PORT": {
     "type": "exporter",
     "exportLevel": "planet",
     "levels": [
@@ -14,7 +14,7 @@
       }
     ]
   },
-  "mine": {
+  "MINE": {
     "type": "generator",
     "levels": [
       {
@@ -30,7 +30,7 @@
       }
     ]
   },
-  "farm": {
+  "FARM": {
     "type": "generator",
     "levels": [
       {
@@ -46,7 +46,7 @@
       }
     ]
   },
-  "house": {
+  "HOUSE": {
     "type": "generator",
     "levels": [
       {
@@ -65,7 +65,7 @@
       }
     ]
   },
-  "vault": {
+  "VAULT": {
     "type": "collector",
     "levels": [
       {

@@ -4,7 +4,7 @@ import { PlanetDataInstance } from "../data/planet";
 import PlanetMap from "../components/PlanetMap";
 import { useContext, useState } from "react";
 import { BuildingDataInstance } from "../data/building";
-import { BUILDING_TYPES } from "../types";
+import { BUILDING_TYPES, CONNECTION_FROM } from "../types";
 import DataContext from "../contexts/DataContext";
 
 const SELECT_MODE = 'select';
@@ -95,7 +95,14 @@ export default function PlanetView() {
 
             if (!otherBuilding) return null;
 
-            return <div>{otherBuilding.type} at ({otherBuilding.x},{otherBuilding.y})</div>
+            return <div>
+              <span>
+                {connection.type === CONNECTION_FROM ? 'From' : 'To'} {otherBuilding.type} at ({otherBuilding.x},{otherBuilding.y})
+              </span>
+              <button onClick={() => {
+                BuildingDataInstance.disconnectBuildings(selectedBuilding.id, otherBuilding.id);
+              }}>X</button>
+            </div>
           })}
           <button onClick={() => {
             setMode(CONNECT_MODE);
