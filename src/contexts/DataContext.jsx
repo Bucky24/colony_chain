@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SystemDataInstance } from '../data/system';
 import { PlanetDataInstance } from '../data/planet';
 import { BuildingDataInstance } from '../data/building';
+import runTick from '../tick/tick';
 
 const DataContext = React.createContext();
 export default DataContext;
@@ -11,6 +12,7 @@ const CURRENT_VERSION = 1;
 export function DataProvider({ children }) {
   const [counter, setCounter] = useState(0);
   const loadedRef = useRef(false);
+  const timerRef = useRef(0);
 
   const values = {
     counter,
@@ -62,6 +64,21 @@ export function DataProvider({ children }) {
 
     loadData();
     loadedRef.current = true;
+
+    const process = () => {
+      timerRef.current ++;
+
+      if (timerRef.current % 5 === 0) {
+        console.log(`Tick`, timerRef.current);
+        runTick();
+      }
+    }
+
+    const interval = setInterval(process, 1000);
+
+    return () => {
+      clearInterval(interval);
+    }
   }, []);
 
   return <DataContext.Provider value={values}>

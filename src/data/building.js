@@ -3,6 +3,13 @@ import Data from "./base";
 import { CONNECTION_FROM, CONNECTION_TO } from "../types";
 
 class BuildingData extends Data {
+  loadData(building) {
+    return {
+      output: {},
+      ...building,
+    };
+  }
+
   createBuilding(type, x, y) {
     const newBuilding = {
       id: v4(),
@@ -10,6 +17,7 @@ class BuildingData extends Data {
       x,
       y,
       connections: [],
+      output: {},
     };
 
     this.set(newBuilding.id, newBuilding);

@@ -30,7 +30,7 @@ export default function PlanetMap({ planetId, onSelect, select }) {
             const image = BUILDING_IMAGES[building.type];
             if (!image) return null;
 
-            return <LayerImage src={image} width={1} height={1} x={building.x} y={building.y} />
+            return <LayerImage key={`building_${buildingId}`} src={image} width={1} height={1} x={building.x} y={building.y} />
           })}
         </Layer>
         <Layer>
@@ -56,6 +56,7 @@ export default function PlanetMap({ planetId, onSelect, select }) {
                     const endDims = getDims(otherBuilding.x, otherBuilding.y, 0.5, 0.5);
 
                     lines.push(<Line
+                      key={`connection_${connection.type}_${building.id}_${connection.otherId}`}
                       x={startDims.x + startDims.width}
                       y={startDims.y + startDims.height}
                       x2={endDims.x + endDims.width}
@@ -68,7 +69,7 @@ export default function PlanetMap({ planetId, onSelect, select }) {
 
               return lines;
             }}
-          ></Cell>
+          />
         </Layer>
         <Layer>
           {select && <Cell

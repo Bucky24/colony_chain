@@ -22,7 +22,16 @@ export default class Data {
   }
   
   setAll(data) {
-    this.__data = {...data};
+    const newData = {...data};
+
+    for (const key in newData) {
+      newData[key] = this.processData(newData[key]);
+    }
+    this.__data = newData;
+  }
+
+  processData(data) {
+    return data;
   }
 
   clear() {
