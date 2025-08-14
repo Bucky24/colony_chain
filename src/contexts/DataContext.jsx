@@ -75,6 +75,7 @@ export function DataProvider({ children }) {
       if (timerRef.current % 5 === 0) {
         console.log(`Tick`, timerRef.current);
         runTick(timerRef.current, activePlanetRef.current);
+        setCounter((counter) => ++counter);
       }
     }
 

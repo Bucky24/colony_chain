@@ -1,5 +1,5 @@
-import { Canvas, Rect, Line } from "@bucky24/react-canvas";
-import { Map, Layer, LayerImage, Cell } from "@bucky24/react-canvas-map";
+import { Canvas, Rect, Line, Image } from "@bucky24/react-canvas";
+import { Map, Layer, Cell } from "@bucky24/react-canvas-map";
 import { PlanetDataInstance } from "../data/planet";
 import { BuildingDataInstance } from "../data/building";
 import { BUILDING_IMAGES, CONNECTION_TO } from "../types";
@@ -30,7 +30,37 @@ export default function PlanetMap({ planetId, onSelect, select }) {
             const image = BUILDING_IMAGES[building.type];
             if (!image) return null;
 
-            return <LayerImage key={`building_${buildingId}`} src={image} width={1} height={1} x={building.x} y={building.y} />
+            const percent = building.output?.percent || 0;
+
+            return <Cell
+              x={building.x}
+              y={building.y}
+              width={1}
+              height={1}
+              key={`building_${buildingId}`}
+              cb={(dims) => {
+                const filled = dims.width * percent;
+                return <>
+                  <Image {...dims} src={image} />
+                  <Rect
+                    x={dims.x}
+                    y={dims.y}
+                    x2={dims.x2}
+                    y2={dims.y + dims.height/10}
+                    color="#f00"
+                    fill={true}
+                  />
+                  <Rect
+                    x={dims.x}
+                    y={dims.y}
+                    x2={dims.x + filled}
+                    y2={dims.y + dims.height/10}
+                    color="#0f0"
+                    fill={true}
+                  />
+                </>
+              }}
+            />
           })}
         </Layer>
         <Layer>

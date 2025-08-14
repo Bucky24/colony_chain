@@ -127,6 +127,7 @@ export default function runTick(tick, activePlanet) {
           building.output = {
             tick,
             perConnection: generatePerConnection,
+            percent: lowestPercent,
           };
         } else if (levelConfig.capacity) {
           // in this case we store up to the capacity of the first type of resource
@@ -135,13 +136,28 @@ export default function runTick(tick, activePlanet) {
             const first = resourceKeys[0];
             const totalAmount = Math.min(levelConfig.capacity, availableResources[first]);
 
+            const percentCapacity = totalAmount / levelConfig.capacity;
+
             building.output = {
               tick,
               // vaults will always use the previous tick for current tick output
               perConnection: building.output?.perConnection,
               next: { [first]: totalAmount / totalToConnections },
+              percent: percentCapacity,
             }
           }
+        } else if (buildingConfig.type === "exporter") {
+          const modifier = levelConfig.exportModifier;
+
+          const exportable = {};
+          for (const key in availableResources) {
+            exportable[key] = availableResources[key] * modifier;
+          }
+
+          building.output = {
+            tick,
+            exported: exportable
+          };
         }
       }
 
@@ -159,6 +175,8 @@ export default function runTick(tick, activePlanet) {
       }
     }
   }
+
+  BuildingDataInstance.emit('change', {});
 
   console.log('Tick completed');
 }
