@@ -3,9 +3,8 @@ import Data from "./base";
 import { CONNECTION_FROM, CONNECTION_TO } from "../types";
 
 class BuildingData extends Data {
-  loadData(building) {
+  processData(building) {
     return {
-      output: {},
       level: 1,
       ...building,
     };

@@ -1,10 +1,10 @@
 import { BuildingDataInstance } from "../data/building";
 import { PlanetDataInstance } from "../data/planet";
 import { SystemDataInstance } from "../data/system";
-import { CONNECTION_FROM } from "../types";
+import { CONNECTION_TO } from "../types";
 import buildingData from '../buildingData.json';
 
-export default function runTick(tick) {
+export default function runTick(tick, activePlanet) {
   const systems = SystemDataInstance.getAll();
 
   for (const system of systems) {
@@ -22,25 +22,25 @@ export default function runTick(tick) {
         });
       }
 
-      while (queue.length > 0) {
-        const queueData = buildingQueue.unshift();
+      while (buildingQueue.length > 0) {
+        const queueData = buildingQueue.shift();
 
         const building = BuildingDataInstance.get(queueData.buildingId);
 
         const buildingConfig = buildingData[building.type];
-        const levelConfig = buildingConfig.levels[building.level];
+        const levelConfig = buildingConfig.levels[building.level-1];
 
         let waitingOnConnections = false;
         let totalToConnections = 0;
         for (const connection of building.connections) {
-          if (connection.type === CONNECTION_FROM) {
+          if (connection.type === CONNECTION_TO) {
             totalToConnections++;
             continue;
           }
           const otherBuilding = BuildingDataInstance.get(connection.otherId);
           if (!otherBuilding) {
             waitingOnConnections = true;
-            break;
+            continue;
           }
 
           const otherBuildingConfig = buildingData[otherBuilding.type];
@@ -49,17 +49,17 @@ export default function runTick(tick) {
           if (otherBuildingConfig.type !== "vault") {
             if (!otherBuilding.output || otherBuilding.output.tick !== tick) {
               waitingOnConnections = true;
-              break;
+              continue;
             }
           }
         }
 
-        if (waitingOnConnections && data.count > 4) {
+        if (waitingOnConnections && queueData.count < 5) {
           // if we've got nore to process and this is not our 5th time processing
           // then kick it to the back of the queue to give more time to the system
           buildingQueue.push({
-            ...data,
-            count: count + 1,
+            ...queueData,
+            count: queueData.count + 1,
           });
           continue;
         }
@@ -69,18 +69,17 @@ export default function runTick(tick) {
 
         const availableResources = {};
         for (const connection of building.connections) {
-          if (connection.type === CONNECTION_FROM) continue;
+          if (connection.type === CONNECTION_TO) continue;
           const otherBuilding = BuildingDataInstance.get(connection.otherId);
           if (!otherBuilding) {
             continue;
           }
 
-          const otherOutput = undefined;
-          otherOutput = otherBuilding.output.perConnection || {};
+          const otherOutput = otherBuilding.output?.perConnection || {};
 
           for (const type in otherOutput) {
             if (!availableResources[type]) availableResources[type] = 0;
-            availableResources[type] += otherBuilding[type];
+            availableResources[type] += otherOutput[type];
           }
         }
 
@@ -93,7 +92,11 @@ export default function runTick(tick) {
               has: availableResources[key] || 0,
             };
 
-            percentRequiredMet[key].percent = Math.max(1, percentRequiredMet.has / percentRequiredMet.desired);
+            if (percentRequiredMet[key].has === 0) {
+              percentRequiredMet[key].percent = 0;
+            } else {
+              percentRequiredMet[key].percent = Math.min(1, percentRequiredMet[key].has / percentRequiredMet[key].desired);
+            }
           }
 
           // the percent we can generate is based on the lowest percent of resources we have available
@@ -107,16 +110,18 @@ export default function runTick(tick) {
           for (const key in levelConfig.generates) {
             let generateAmount = levelConfig.generates[key] * lowestPercent;
             if (levelConfig.generatesMin?.[key]) {
-              generatesAmount = Math.max(levelConfig.generatesMin[key], generateAmount);
+              generateAmount = Math.max(levelConfig.generatesMin[key], generateAmount);
             }
 
-            canGenerate[key] = generatesAmount;
+            canGenerate[key] = generateAmount;
           }
 
           // this becomes our new output. Now we need to split it evenly among all our "to" connections
           const generatePerConnection = {};
-          for (const key in canGenerate) {
-            generatePerConnection[key] = canGenerate[key] / totalToConnections;
+          if (totalToConnections > 0) {
+            for (const key in canGenerate) {
+              generatePerConnection[key] = canGenerate[key] / totalToConnections;
+            }
           }
 
           building.output = {
@@ -145,13 +150,15 @@ export default function runTick(tick) {
         const building = BuildingDataInstance.get(buildingId);
         if (!building) continue;
 
-        if (building.output.next) {
+        if (building.output?.next) {
           building.output = {
             tick,
-            perConnection: building.output.next,
+            perConnection: building.output?.next || {},
           };
         }
       }
     }
   }
+
+  console.log('Tick completed');
 }

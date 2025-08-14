@@ -13,10 +13,14 @@ export function DataProvider({ children }) {
   const [counter, setCounter] = useState(0);
   const loadedRef = useRef(false);
   const timerRef = useRef(0);
+  const activePlanetRef = useRef(null);
 
   const values = {
     counter,
     loaded: loadedRef.current,
+    setActivePlanet: (active) => {
+      activePlanetRef.current = active;
+    }
   };
 
   const saveData = () => {
@@ -70,7 +74,7 @@ export function DataProvider({ children }) {
 
       if (timerRef.current % 5 === 0) {
         console.log(`Tick`, timerRef.current);
-        runTick();
+        runTick(timerRef.current, activePlanetRef.current);
       }
     }
 
