@@ -6,6 +6,7 @@ class BuildingData extends Data {
   loadData(building) {
     return {
       output: {},
+      level: 1,
       ...building,
     };
   }
@@ -18,6 +19,7 @@ class BuildingData extends Data {
       y,
       connections: [],
       output: {},
+      level: 1,
     };
 
     this.set(newBuilding.id, newBuilding);
